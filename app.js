@@ -6,15 +6,11 @@ const  userRouter = require('./routes/userRoutes');
 
 const app = express(); // Main Router
 
-// ============= Middleware ==============
+// ================== Middleware =====================
 app.use(express.json()); // Middleware to send the req json body
 app.use(morgan('dev')); // Middleware for logging
 
-app.use((req, res, next) => {
-    console.log('Hello form the middleware');
-    next();
-});
-
+    // Middleware for Created Date/Time
 app.use((req, res, next) => {
     req.reqestTime = new Date().toISOString();
     next();

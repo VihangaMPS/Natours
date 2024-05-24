@@ -14,6 +14,16 @@ exports.checkId = (req, res, next, value) => {
     next();
 };
 
+exports.checkBody = (req, res, next) => {
+    if (!req.body.name || !req.body.price) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Missing name or price'
+        })
+    }
+    next();
+}
+
 // ==========  Handler Functions  ==============
 exports.getAllTours = (req, res) => {
     console.log(req.reqestTime);
@@ -29,7 +39,9 @@ exports.getAllTours = (req, res) => {
 };
 
 exports.getTour = (req, res) => {
-    // console.log(req.params); // request paramId gives output as a String
+    console.log(req.params); // request paramId gives output as a String { id: ? }
+    console.log(req.reqestTime); // gives you created date
+
     const id = req.params.id * 1; // converting paramId(String) to a int
     const tour = tours.find(element => element.id === id);
 
