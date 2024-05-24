@@ -1,8 +1,12 @@
 const express = require('express');
 const fs = require("fs");
+const morgan = require('morgan');
 
 const app = express();
+
+// ============= Middleware ==============
 app.use(express.json()); // Middleware to send the req body
+app.use(morgan('dev')); // Middleware for logging
 
 app.use((req, res, next) => {
     console.log('Hello form the middleware');
@@ -17,6 +21,7 @@ app.use((req, res, next) => {
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
 
+// ========== Routes Handlers ==============
 const getAllTours = (req, res) => {
     console.log(req.reqestTime)
     res.status(200)
@@ -96,6 +101,7 @@ const deleteTour = (req, res) => {
     });
 };
 
+// ========== Routes  ==============
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 app.route('/api/v1/tours:id').get(getTour).patch(updateTour).delete(deleteTour);
 
