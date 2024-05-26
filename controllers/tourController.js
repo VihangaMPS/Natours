@@ -1,12 +1,20 @@
 const Tour = require('../models/tourModel');
-const e = require("express");
 
 // const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
 
 // ==========  Handler Functions  ==============
 exports.getAllTours = async (req, res) => {
     try {
-        const tours = await Tour.find();
+        // ---------- Build Query ----------
+        const queryObj = {...req.query};
+        const excludedFields = ['page', 'sort', 'limit', 'fields'];
+        excludedFields.forEach(element => delete queryObj[element])
+        // console.log(req.query, queryObj);
+
+        const query = Tour.find(queryObj); // find() returns a query object
+
+        // ---------- Create Query ----------
+        const tours = await query;
 
         res.status(200)
             .json({
