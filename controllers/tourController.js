@@ -5,7 +5,7 @@ const Tour = require('../models/tourModel');
 // ==========  Handler Functions  ==============
 exports.getAllTours = async (req, res) => {
     try {
-        console.log(req.query); // request info -> ex:{ duration: { gte: '5' }, difficulty: 'easy', price: { lt: '1000' } }
+        console.log("req.query : " , req.query); // request info -> ex:{ duration: { gte: '5' }, difficulty: 'easy', price: { lt: '1000' } }
 
         // 1a) Filtering
         // ---------- Build Query ----------
@@ -21,13 +21,25 @@ exports.getAllTours = async (req, res) => {
 
         let query = Tour.find(JSON.parse(queryString)); // find() returns a query object
 
-        // 2a) Sorting
+        // 2) Sorting
         if (req.query.sort) {
             const sortBy = req.query.sort.split(',').join(' ');
             query = query.sort(sortBy);
         } else {
             query = query.sort('-createdAt'); // setting default sort
         }
+
+        // 3) Field Limiting
+        if (req.query.fields) {
+            // console.log(req.query.fields); // String -> ex: name,price,duration
+            const fields = req.query.fields.split(',').join(' ');
+            query = query.select(fields);
+        } else {
+            query = query.select('-__v'); // fields that need to be ignored when sending
+            // '-?' means -> field need to be ignored | '?' means -> only this field will send other fields get ignored
+        }
+
+
 
         // ---------- Execute Query ----------
         const tours = await query;
