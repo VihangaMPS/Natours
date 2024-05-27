@@ -5,15 +5,31 @@ const Tour = require('../models/tourModel');
 // ==========  Handler Functions  ==============
 exports.getAllTours = async (req, res) => {
     try {
+        console.log(req.query); // request info -> ex:{ duration: { gte: '5' }, difficulty: 'easy', price: { lt: '1000' } }
+
+        // 1a) Filtering
         // ---------- Build Query ----------
         const queryObj = {...req.query};
         const excludedFields = ['page', 'sort', 'limit', 'fields'];
         excludedFields.forEach(element => delete queryObj[element])
-        // console.log(req.query, queryObj);
 
-        const query = Tour.find(queryObj); // find() returns a query object
+        // 1b) Advanced Filtering
+        let queryString = JSON.stringify(queryObj);
+        queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+        // console.log(queryString); // ex: {"duration":{"$gte":"5"},"difficulty":"easy","price":{"$lt":"1000"}}
+        // console.log(JSON.parse(queryString)); // converting JSON String to a JSON Object
 
-        // ---------- Create Query ----------
+        let query = Tour.find(JSON.parse(queryString)); // find() returns a query object
+
+        // 2a) Sorting
+        if (req.query.sort) {
+            const sortBy = req.query.sort.split(',').join(' ');
+            query = query.sort(sortBy);
+        } else {
+            query = query.sort('-createdAt'); // setting default sort
+        }
+
+        // ---------- Execute Query ----------
         const tours = await query;
 
         res.status(200)
