@@ -9,10 +9,6 @@ const LocalDB = process.env.DATABASE_LOCAL; // Mongo Local
 mongoose.connect(AtlasDB).then(() => console.log('DB Connection successful!'));
 
 
-
-
-
-
 const port = process.env.PORT;
 app.listen(port, () => {
     console.log(`App running on port ${port}...`)

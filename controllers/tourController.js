@@ -39,6 +39,19 @@ exports.getAllTours = async (req, res) => {
             // '-?' means -> field need to be ignored | '?' means -> only this field will send other fields get ignored
         }
 
+        // 4) Pagination
+        const pageNum = req.query.page * 1 || 1;
+        const limit = req.query.limit * 1 || 10;
+        const skip = (pageNum - 1) * limit;
+
+        query = query.skip(skip).limit(limit);
+
+        if (req.query.page) {
+            const numTours = await Tour.countDocuments();
+            if (skip > numTours) {
+                throw new Error('This page does not exists !');
+            }
+        }
 
 
         // ---------- Execute Query ----------
