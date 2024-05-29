@@ -1,6 +1,5 @@
 const Tour = require('../models/tourModel');
-
-// const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
+const APIFeatures = require('../utils/apiFeatures');
 
 // ==========  Handler Functions  ==============
 exports.aliasTopTours = (req, res, next) => {
@@ -10,59 +9,15 @@ exports.aliasTopTours = (req, res, next) => {
     next();
 }
 
+
+
 exports.getAllTours = async (req, res) => {
     try {
         console.log("req.query : " , req.query); // request info -> ex:{ duration: { gte: '5' }, difficulty: 'easy', price: { lt: '1000' } }
 
-        // 1a) Filtering
-        // ---------- Build Query ----------
-        const queryObj = {...req.query};
-        const excludedFields = ['page', 'sort', 'limit', 'fields'];
-        excludedFields.forEach(element => delete queryObj[element])
-
-        // 1b) Advanced Filtering
-        let queryString = JSON.stringify(queryObj);
-        queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-        // console.log(queryString); // ex: {"duration":{"$gte":"5"},"difficulty":"easy","price":{"$lt":"1000"}}
-        // console.log(JSON.parse(queryString)); // converting JSON String to a JSON Object
-
-        let query = Tour.find(JSON.parse(queryString)); // find() returns a query object
-
-        // 2) Sorting
-        if (req.query.sort) {
-            const sortBy = req.query.sort.split(',').join(' ');
-            query = query.sort(sortBy);
-        } else {
-            query = query.sort('-createdAt'); // setting default sort
-        }
-
-        // 3) Field Limiting
-        if (req.query.fields) {
-            // console.log(req.query.fields); // String -> ex: name,price,duration
-            const fields = req.query.fields.split(',').join(' ');
-            query = query.select(fields);
-        } else {
-            query = query.select('-__v'); // fields that need to be ignored when sending
-            // '-?' means -> field need to be ignored | '?' means -> only this field will send other fields get ignored
-        }
-
-        // 4) Pagination
-        const pageNum = req.query.page * 1 || 1;
-        const limit = req.query.limit * 1 || 10;
-        const skip = (pageNum - 1) * limit;
-
-        query = query.skip(skip).limit(limit);
-
-        if (req.query.page) {
-            const numTours = await Tour.countDocuments();
-            if (skip > numTours) {
-                throw new Error('This page does not exists !');
-            }
-        }
-
-
         // ---------- Execute Query ----------
-        const tours = await query;
+        const features = new APIFeatures(Tour.find(), req.query.filter().sort().limitFields().pagination());
+        const tours = await features.query;
 
         res.status(200)
             .json({
