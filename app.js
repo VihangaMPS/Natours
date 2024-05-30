@@ -9,22 +9,21 @@ const app = express(); // Main Router
 // ================== Middleware =====================
 app.use(express.json()); // Middleware to send the req json body when we create(POST)
 
-if (process.env.NODE_ENV === 'development') { // only show logging in 'Development' not in 'Production'
+    // ------------  Only show logging in 'Development' not in 'Production' --------------
+if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev')); // Middleware for logging
 }
+    // ------------ Accessing Static files --------------
+app.use(express.static(`${__dirname}/public`));
 
-app.use(express.static(`${__dirname}/public`)); // serving static files
-
-    // Middleware for Created Date/Time
+    // ------------ Middleware for Custom Date/Time -----------
 app.use((req, res, next) => {
     req.reqestTime = new Date().toISOString();
     next();
 });
 
-
 // ========== Middleware Routes  ==============
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
-// ====================== SERVER ======================
 module.exports = app;
