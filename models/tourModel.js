@@ -75,26 +75,44 @@ tourSchema.virtual('durationWeeks').get( function () {
 // -------------- Document Middleware: Runs before only .save() and .create() --------------
 tourSchema.pre('save', function (next) {
     this.slug = slugify(this.name, { lower: true});
+    // in Schema { slug: String } -> adding a new field ex: slug: this.name
+
     next();
 });
-// tourSchema.pre('save', function (next) {
-//     console.log('Will save documents...');
-//     next();
-// });
-// tourSchema.post('save', function (doc, next) {
-//     console.log(doc);
-//     next();
-// });
+/*tourSchema.pre('save', function (next) {
+    console.log('Will save documents...');
+    next();
+});
+tourSchema.post('save', function (doc, next) {
+    console.log(doc);
+    next();
+});*/
 
 // -------------- Query Middleware --------------
 tourSchema.pre(/^find/, function (next) {
     this.find({ secretTour: { $ne: true } });
+    // in Schema,
+    // secretTour: {
+    //         type: Boolean,
+    //         default: false
+    //     }
+    // if we add a "{secretTour: true}" as a new private secret tour,
+    // Database will store that data but when we request a getAllTours we receive only secretTour hidden documents.
+    //                  reason by default secretTour set to false.
+
     this.start = Date.now();
     next();
 });
 tourSchema.post(/^find/, function (docs, next) {
     console.log(`Query took ${Date.now() - this.start}ms`)
-    console.log(docs); // documents that matched the query
+    // console.log(docs); // documents that matched the query
+    next();
+});
+
+// -------------- Aggregation Middleware --------------
+tourSchema.pre('aggregate', function (next) {
+    this.pipeline().unshift( { $match: { secretTour: { $ne: true } }});
+    console.log(this.pipeline());
     next();
 });
 
