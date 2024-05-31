@@ -82,6 +82,12 @@ tourSchema.pre('save', function (next) {
 //     next();
 // });
 
+// Query Middleware
+tourSchema.pre('find', function (next) {
+
+    next();
+});
+
 // ================ Converting the Schema Structure to Table ================
 const Tour = mongoose.model('Tour', tourSchema);
 
