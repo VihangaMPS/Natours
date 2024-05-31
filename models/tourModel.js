@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 
 // ================ Building the Schema Structure ================
 const tourSchema = new mongoose.Schema({
@@ -7,7 +8,9 @@ const tourSchema = new mongoose.Schema({
         type: String,
         required: [true, 'A Tour must have a name'],
         unique: true,
-        trim: true
+        trim: true,
+        maxLength: [40, 'A Tour name must have <=40 characters'],
+        minLength: [10, 'A Tour name must have >=10 characters']
     },
     slug: String,
     duration: {
@@ -20,7 +23,11 @@ const tourSchema = new mongoose.Schema({
     },
     difficulty: {
         type: String,
-        required: [true, 'A Tour mush have a difficulty']
+        required: [true, 'A Tour mush have a difficulty'],
+        enum: {
+            values: ['easy', 'medium', 'difficulty'],
+            message: 'Difficulty is either: easy, medium, difficult'
+        }
     },
     ratingsAverage: {
         type: Number,
@@ -37,7 +44,15 @@ const tourSchema = new mongoose.Schema({
         required: [true, 'A Tour must have a price']
     },
     priceDiscount: {
-        type: Number
+        type: Number,
+        validate: {
+            validator: function (value) {
+                return value < this.price; // this keyword only support for creating a document
+            },
+            message: 'Discount price ({VALUE}) should be below regular price'
+        }
+
+
     },
     summary: {
         type: String,
@@ -115,6 +130,8 @@ tourSchema.pre('aggregate', function (next) {
     console.log(this.pipeline());
     next();
 });
+
+
 
 // ================ Converting the Schema Structure to Table ================
 const Tour = mongoose.model('Tour', tourSchema);
