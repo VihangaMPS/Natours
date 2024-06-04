@@ -6,7 +6,7 @@ const Tour = require('../../models/tourModel')
 dotenv.config({path: './config.env'});
 
 // ================= DataBase Connection =================
-const AtlasDB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD).replace('<DBNAME>', process.env.DATABASE_NAME); // Mongo Atlas
+const AtlasDB = process.env.DATABASE_ATLAS.replace('<PASSWORD>', process.env.DATABASE_PASSWORD).replace('<DBNAME>', process.env.DATABASE_NAME); // Mongo Atlas
 const LocalDB = process.env.DATABASE_LOCAL; // Mongo Local
 mongoose.connect(AtlasDB).then(() => console.log('DB Connection successful!'));
 
