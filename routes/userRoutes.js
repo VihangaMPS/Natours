@@ -6,7 +6,8 @@ const authController = require('../controllers/authController');
 const userRouter = express.Router();
 
     // -------------- Custom Routes --------------
-userRouter.route('/signup').post(authController.signup)
+userRouter.route('/signup').post(authController.signup);
+userRouter.route('/login').post(authController.login);
 
     // -------------- REST Routes --------------
 userRouter.route('/').get(userController.getAllUsers).post(userController.createUser);
