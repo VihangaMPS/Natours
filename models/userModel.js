@@ -61,19 +61,19 @@ userSchema.methods.correctPassword = async function (candidatePassword, userEncr
 // Checking password again if user have changed -------------------
 userSchema.methods.changePasswordAfter = function (JWTTimestamp) {
     if (this.passwordChangedAt) {
-        const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000);
+        const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
 
         // console.log( JWTTimestamp,changedTimestamp, (JWTTimestamp < changedTimestamp));
         return JWTTimestamp < changedTimestamp;
     }
 
-    return false;
+    return false; // False means NOT changed
 }
 
 userSchema.methods.createPasswordResetToken = function () {
     const resetToken = crypto.randomBytes(32).toString('hex'); // creating random token, to send to user
 
-    this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex'); // creating encrypted token using the real resetToken & storing in database
     console.log({resetToken}, this.passwordResetToken);
 
     this.passwordResetExpires = Date.now() + (10*60*1000);
