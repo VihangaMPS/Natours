@@ -9,18 +9,20 @@ const  userRouter = require('./routes/userRoutes');
 const app = express(); // Main Router
 
 // ================== Middleware =====================
-app.use(express.json()); // Middleware to send the req json body when we create(POST)
+    // ----------- Middleware to send the req json body when we create(POST) -----------
+app.use(express.json());
 
-    // ------------  Only show logging in 'Development' not in 'Production' --------------
+    // -------- Middleware for logging ----------
 if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev')); // Middleware for logging
+    app.use(morgan('dev'));
 }
-    // ------------ Accessing Static files --------------
+    // ------------ Setting Public Directory Path Accessing Static files --------------
 app.use(express.static(`${__dirname}/public`));
 
-    // ------------ Middleware for Custom Date/Time -----------
+    // ------------ Custom Middleware -----------
 app.use((req, res, next) => {
     req.reqestTime = new Date().toISOString();
+    // console.log(req.headers);
     next();
 });
 
@@ -28,18 +30,10 @@ app.use((req, res, next) => {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.all('*', (req, res, next) => {
-    /* // res.status(404).json({
-    //     status: 'fail',
-    //     message: `Can't find ${req.originalUrl} on this server!`
-    // });
-
-    // const err = new Error(`Can't find ${req.originalUrl} on this server!`);
-    // err.status = 'fail';
-    // err.statusCode = 404;*/
-
     next(  new AppError(`Can't find ${req.originalUrl} on this server!`, 404) );
 });
 
+// ========== Global Error Handling Middleware ==============
 app.use(globalErrorHandler);
 
 module.exports = app;

@@ -30,26 +30,41 @@ const userSchema = new mongoose.Schema({
             },
             message: 'Passwords are not same'
         }
-    }
+    },
+    passwordChangedAt: Date
 });
 
 // Encrypting password when new User Signup --------------------
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
 
-    // encrypt password ---------
+    // encrypting password ---------
     this.password = await bcrypt.hash(this.password, 12);
-    this.passwordConfirm = undefined; // we delete passwordConfirm bcuz we don't need it other than only for validation
+    this.passwordConfirm = undefined; // Deleting passwordConfirm field from adding to Mongo DB,bcuz we don't need it other than only for validation
 
     next();
 });
 
 // Instance Method Comparing bcrypt password to user login password -----------------
 userSchema.methods.correctPassword = async function (candidatePassword, userEncryptPassword) {
-    return await bcrypt.compare(candidatePassword, userEncryptPassword);
+    return await bcrypt.compare(candidatePassword, userEncryptPassword); // return true  or false
 };
+
+
+userSchema.methods.changePasswordAfter = function (JWTTimestamp) {
+    if (this.passwordChangedAt) {
+        const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000);
+
+        // console.log( JWTTimestamp,changedTimestamp, (JWTTimestamp < changedTimestamp));
+        return JWTTimestamp < changedTimestamp;
+    }
+
+    return false;
+}
 
 const User = mongoose.model('User', userSchema)
 
 
 module.exports = User;
+
+// change password method : 22:15

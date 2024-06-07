@@ -12,7 +12,8 @@ exports.aliasTopTours = (req, res, next) => {
 }
 
 exports.getAllTours = catchAsync(async (req, res, next) =>  {
-    console.log("getAllTours req.query : " , req.query); // request info -> ex:{ duration: { gte: '5' }, difficulty: 'easy', price: { lt: '1000' } }
+    // console.log("getAllTours req.query : " , req.query);
+    // request info -> ex:{ duration: { gte: '5' }, difficulty: 'easy', price: { lt: '1000' } }
 
     // ---------- Execute Query ----------
     const features =

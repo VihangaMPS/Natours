@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// --------- Handling UnCaughtExceptions/Synchronous Promises ----------
+// --------- Handling UnCaughtExceptions/Synchronous ----------
 process.on('uncaughtException', err => {
     console.log(' UnCaughtExceptions !!  Shutting down...')
     console.log(err.name, err.message);
@@ -22,7 +22,7 @@ const server = app.listen(port, () => {
     console.log(`App running on port ${port}...`)
 });
 
-    // --------- Handling UnHandleRejection/Asynchronous Promises ----------
+    // --------- Handling UnHandleRejection/Asynchronous ----------
 process.on('unhandledRejection', err => {
     console.log('UnHandled Rejection !!  Shutting down...')
     console.log(err.name, err.message);
