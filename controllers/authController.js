@@ -51,9 +51,9 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.protect = catchAsync( async (req, res, next) => {
     // 1) Getting token and check if it's there
     let token;
-        // Splitting the token from authorization header
+
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        token = req.headers.authorization.split(" ")[1];
+        token = req.headers.authorization.split(" ")[1]; // Splitting the token from authorization header(Bearer "token")
     }
 
     if (!token) {
@@ -62,22 +62,31 @@ exports.protect = catchAsync( async (req, res, next) => {
 
     // 2) Verification token
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET); // taking payload data using authorized token & jwt secret
-    // console.log("decoded :",decoded);
 
     // 3) Check if user still exists
-    const freshUser = await User.findById(decoded.id);
-    if (!freshUser) {
+    const currentUser = await User.findById(decoded.id);
+
+    if (!currentUser) {
         return next(new AppError('The User belonging to the token does not exists!', 401))
     }
 
     // 4) Check if user changed password after the token was issued
-    // console.log(decoded.iat, freshUser.changePasswordAfter(decoded.iat));
-    if (freshUser.changePasswordAfter(decoded.iat)) { // iat -> created time | exp -> expired time
+    if (currentUser.changePasswordAfter(decoded.iat)) { // iat -> created time | exp -> expired time
         return next(new AppError('User recently changed password! Please login again', 401));
     }
 
     // 5) Grant access to Protected Route
-    req.user = freshUser;
+    req.user = currentUser;
 
     next();
 });
+
+exports.restrictTo = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return next(new AppError('You do not have permission to perform this action', 403)); // Forbidden error
+        }
+
+        next();
+    }
+}
