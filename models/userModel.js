@@ -53,6 +53,14 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
+userSchema.pre('save', function (next) {
+    if (!this.isModified('password') || this.isNew) return next();
+
+    this.passwordChangedAt = Date.now() - 1000;
+
+    next();
+});
+
 // Instance Method Comparing bcrypt password to user login password -----------------
 userSchema.methods.correctPassword = async function (candidatePassword, userEncryptPassword) {
     return await bcrypt.compare(candidatePassword, userEncryptPassword); // return true  or false
