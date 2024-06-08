@@ -6,18 +6,17 @@ const AppError = require('../utils/appError');
 // ==========  Handler Functions  ==============
 exports.aliasTopTours = (req, res, next) => {
     req.query.limit = '5';
-    req.query.sort = '-ratingsAverage';
+    req.query.sort = '-ratingsAverage'; // - -> DESC(10-1) | + -> ASC(1-10)
     req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
     next();
 }
 
 exports.getAllTours = catchAsync(async (req, res, next) =>  {
-    // console.log("getAllTours req.query : " , req.query);
+    console.log("getAllTours req.query : " , req.query);
     // request info -> ex:{ duration: { gte: '5' }, difficulty: 'easy', price: { lt: '1000' } }
 
     // ---------- Execute Query ----------
-    const features =
-        new APIFeatures(Tour.find(), req.query).filter().sortData().limitFields().pagination() ;
+    const features = new APIFeatures(Tour.find(), req.query).filter().sortData().limitFields().pagination() ;
     const tours = await features.query;
 
     res.status(200)

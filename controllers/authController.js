@@ -13,18 +13,23 @@ const signToken = id => {
     });
 }
 
-exports.signup = catchAsync(async (req, res, next) => {
-    const newUser = await User.create(req.body);
+// Sending the token, that created when Signup,Login,ResetPassword,UpdatePassword
+const createSendToken = (user, statusCode, res) => {
+    const token = signToken(user._id);
 
-    const token = signToken(newUser._id);
-
-    res.status(201).json({ // 201 - created
+    res.status(statusCode).json({ // 201 - created
         status: 'success',
         token: token,
         data: {
-            user: newUser
+            user: user
         }
     })
+}
+
+exports.signup = catchAsync(async (req, res, next) => {
+    const newUser = await User.create(req.body);
+
+    createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -43,11 +48,7 @@ exports.login = catchAsync(async (req, res, next) => {
     }
 
     // 3)If everything ok, send token to client
-    const token = signToken(user._id);
-    res.status(200).json({
-        status: 'success',
-        token: token
-    });
+    createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync( async (req, res, next) => {
@@ -63,7 +64,7 @@ exports.protect = catchAsync( async (req, res, next) => {
     }
 
     // 2) Verification token
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET); // taking payload data using authorized token & jwt secret
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
     // 3) Check if user still exists
     const currentUser = await User.findById(decoded.id);
@@ -151,11 +152,24 @@ exports.resetPassword = catchAsync( async (req, res, next) => {
 
 
     // 4) Log the user in,send JWT
-    const token = signToken(user._id);
+    createSendToken(user, 200, res);
+});
 
-    res.status(200).json({
-        status: 'success',
-        token: token
-    })
+exports.updatePassword = catchAsync( async(req, res,next) => {
+    // 1) Get user from collection
+    const user = await User.findById(req.user.id).select("+password");
+    console.log(user);
+    console.log(req.body);
+    // 2) Check if POST current password is correct
+    if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+        return next(new AppError('Your current password is wrong', 401));
+    }
 
+    // 3) If Correct, Update Password
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    await user.save();
+
+    // 4) Log user in, send JWT
+    createSendToken(user, 200, res);
 });
