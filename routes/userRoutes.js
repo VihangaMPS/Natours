@@ -11,6 +11,7 @@ userRouter.route('/login').post(authController.login);
 userRouter.route('/forgotPassword').post(authController.forgotPassword);
 userRouter.route('/resetPassword/:token').patch(authController.resetPassword);
 userRouter.route('/updateMyPassword').patch(authController.protect,authController.updatePassword);
+userRouter.route('/updateMe').patch(authController.protect,userController.updateMe)
 
     // -------------- REST Routes --------------
 userRouter.route('/').get(userController.getAllUsers).post(userController.createUser);

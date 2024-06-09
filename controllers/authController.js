@@ -13,7 +13,7 @@ const signToken = id => {
     });
 }
 
-// Sending the token, that created when Signup,Login,ResetPassword,UpdatePassword
+// Sending the created token, when Signup,Login,ResetPassword,UpdatePassword
 const createSendToken = (user, statusCode, res) => {
     const token = signToken(user._id);
 
