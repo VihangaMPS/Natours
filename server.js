@@ -29,3 +29,10 @@ process.on('unhandledRejection', err => {
     server.close(() => process.exit(1)); // 0 - Success & 1 - UnCaught Exceptions
 });
 
+// ----------------------------------------------------------------------------------------------
+
+//in Mongo DB, there are two type of Data Modeling
+    // 1) EMBEDDED/DENORMALIZED  2)REFERENCED/NORMALIZED
+
+// so we use Embedded, High Read/Low Write data
+            // Referenced, Low Read/High Write data
