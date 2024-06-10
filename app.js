@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -16,6 +17,15 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
+
+    // ---------- Middleware for Limiting requests ------------
+const limiter = rateLimit({
+    max: 5,
+    windowMs: 60 * 60 * 1000, // 1hr = (60 * 60 * 1000)ms
+    message: 'Too many request from this IP, Please try again in an hour!'
+});
+app.use('/api', limiter);
+
     // ------------ Setting Public Directory Path Accessing Static files --------------
 app.use(express.static(`${__dirname}/public`));
 
