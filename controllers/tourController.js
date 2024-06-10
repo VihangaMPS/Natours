@@ -12,7 +12,7 @@ exports.aliasTopTours = (req, res, next) => {
 }
 
 exports.getAllTours = catchAsync(async (req, res, next) =>  {
-    console.log("getAllTours req.query : " , req.query);
+    // console.log("getAllTours req.query : " , req.query);
     // request info -> ex:{ duration: { gte: '5' }, difficulty: 'easy', price: { lt: '1000' } }
 
     // ---------- Execute Query ----------
@@ -50,7 +50,6 @@ exports.getTour = catchAsync(async (req, res, next) => {
 });
 
 exports.createTour = catchAsync(async (req, res, next) => {
-    console.log(req.body);
     const newTour = await Tour.create(req.body);
 
     res.status(201).json({
