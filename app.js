@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -11,9 +12,14 @@ const app = express(); // Main Router
 
 // ================== Middleware =====================
     // ----------- Middleware to send the req json body when we create(POST) -----------
-app.use(express.json());
+app.use(express.json({
+    limit: '10kb'
+}));
 
-    // -------- Middleware for logging ----------
+    // ---------- Setting Security HTTP Headers -----------
+app.use(helmet())
+
+    // -------- Middleware for Development logging ----------
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
@@ -29,7 +35,7 @@ app.use('/api', limiter);
     // ------------ Setting Public Directory Path Accessing Static files --------------
 app.use(express.static(`${__dirname}/public`));
 
-    // ------------ Custom Middleware -----------
+    // ------------ Custom Test Middleware -----------
 app.use((req, res, next) => {
     req.reqestTime = new Date().toISOString();
     // console.log(req.headers);
