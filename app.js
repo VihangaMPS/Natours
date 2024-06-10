@@ -4,11 +4,13 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const  userRouter = require('./routes/userRoutes');
+const http = require("node:http");
 
 const app = express(); // Main Router
 
@@ -20,7 +22,12 @@ app.use(express.json({ limit: '15kb' }));
 app.use(mongoSanitize()); // filtered out operators
 
     // ------------ Data Sanitization against XSS ------------
-app.use(xss());
+app.use(xss()); // preventing HTML XSS attacks
+
+    // ------------ Prevent Parameter Pollution ------------
+app.use(hpp({
+    whitelist: ['duration', "maxGroupSize", "difficulty", "ratingsAverage", "ratingsQuantity", 'price']
+}));
 
     // ---------- Setting Security HTTP Headers -----------
 app.use(helmet())
