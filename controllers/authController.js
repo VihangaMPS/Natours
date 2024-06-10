@@ -17,6 +17,20 @@ const signToken = id => {
 const createSendToken = (user, statusCode, res) => {
     const token = signToken(user._id);
 
+    const cookieOptions = {
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000), // converting to milliseconds
+        httpOnly: true
+    };
+    // Number of seconds in a day = 24 * 60 * 60 = 86400 seconds for 1 day. ||||  1 second = 1000 milliseconds
+    // Result is in milliseconds : days * 24 * 60 * 60 * 1000 = days * 86400000 ms
+    if (process.env.NODE_ENV === 'production') {
+        cookieOptions.secure = true; // cookie will only send in HTTPS connection
+    }
+    res.cookie('jwt', token, cookieOptions);
+
+    // Remove the password from response
+    user.password = undefined;
+
     res.status(statusCode).json({ // 201 - created
         status: 'success',
         token: token,
