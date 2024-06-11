@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
-const User = require('./userModel');
+// const User = require('./userModel'); // -> use it for Embedded
 
 // ================ Building the Schema Structure ================
 const tourSchema = new mongoose.Schema({
@@ -101,7 +101,13 @@ const tourSchema = new mongoose.Schema({
             day: Number
         }
     ],
-    guides: Array // Embedded
+    // guides: Array // Embedded
+    guides: [ // Referenced
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'User'
+        }
+    ]
 }, { // applying options to tell schema to add virtual data to the document
     toJSON: { virtuals: true },
     toObject: { virtuals: true}
@@ -120,12 +126,12 @@ tourSchema.pre('save', function (next) {
 });
 
     // Embedding Tour Guides into Tour document -------------
-tourSchema.pre('save', async function (next) {
-    const guidesPromises = this.guides.map(async id => await User.findById(id));
-    this.guides = await Promise.all(guidesPromises);
-
-    next();
-});
+// tourSchema.pre('save', async function (next) {
+//     const guidesPromises = this.guides.map(async id => await User.findById(id));
+//     this.guides = await Promise.all(guidesPromises);
+//
+//     next();
+// });
 
     // Testing POST Document middleware ----------
 tourSchema.post('save', function (doc, next) {
@@ -150,6 +156,15 @@ tourSchema.pre(/^find/, function (next) {
     next();
 });
 
+tourSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: 'guides',
+        select: '-__v -passwordChangedAt'
+    });
+
+    next();
+})
+
 tourSchema.post(/^find/, function (docs, next) {
     console.log(`Query took ${Date.now() - this.start}ms`)
     // console.log(docs); // documents that matched the query
@@ -159,7 +174,7 @@ tourSchema.post(/^find/, function (docs, next) {
 // -------------- Aggregation Middleware --------------
 tourSchema.pre('aggregate', function (next) {
     this.pipeline().unshift( { $match: { secretTour: { $ne: true } }});
-    console.log(this.pipeline());
+    console.log("Aggregation pipeline :",this.pipeline());
     next();
 });
 

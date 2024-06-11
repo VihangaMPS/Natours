@@ -34,7 +34,8 @@ exports.getTour = catchAsync(async (req, res, next) => {
         console.log("req.params.id :", req.params.id);
     }
     const tour = await Tour.findById(req.params.id);
-    console.log(typeof tour.id)
+    // Populate means -> if we don't use populate we get only the reference id.
+    // if we use populate we get the data for that reference id but only give in response,not updating real database.
 
     if (!tour) {
         return next(new AppError('No tour found with that ID', 404));
