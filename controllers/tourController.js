@@ -33,7 +33,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
     if (process.env.NODE_ENV === 'development') {
         console.log("req.params.id :", req.params.id);
     }
-    const tour = await Tour.findById(req.params.id);
+    const tour = await Tour.findById(req.params.id).populate('reviews');
     // Populate means -> if we don't use populate we get only the reference id.
     // if we use populate we get the data for that reference id but only give in response,not updating real database.
 

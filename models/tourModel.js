@@ -102,7 +102,7 @@ const tourSchema = new mongoose.Schema({
         }
     ],
     // guides: Array // Embedded
-    guides: [ // Referenced
+    guides: [ // Referenced -> Child Reference
         {
             type: mongoose.Schema.ObjectId,
             ref: 'User'
@@ -113,9 +113,16 @@ const tourSchema = new mongoose.Schema({
     toObject: { virtuals: true}
 });
 
+// Virtual data won't save in Database access only in response
 tourSchema.virtual('durationWeeks').get( function () {
-    return this.duration / 7; // calculating days for a week
+    return this.duration / 7; // creating a virtual key field "durationWeeks" & assigning calculated days for a week
 });
+
+tourSchema.virtual('reviews', {
+    ref: 'Review',
+    foreignField: 'tour', // assigning field name for referenced id in foreign schema
+    localField: '_id' // assigning referenced id in current schema
+})
 
 // -------------- Document Middleware: Runs before only .save() and .create() --------------
 tourSchema.pre('save', function (next) {
@@ -126,12 +133,12 @@ tourSchema.pre('save', function (next) {
 });
 
     // Embedding Tour Guides into Tour document -------------
-// tourSchema.pre('save', async function (next) {
-//     const guidesPromises = this.guides.map(async id => await User.findById(id));
-//     this.guides = await Promise.all(guidesPromises);
-//
-//     next();
-// });
+/*tourSchema.pre('save', async function (next) {
+    const guidesPromises = this.guides.map(async id => await User.findById(id));
+    this.guides = await Promise.all(guidesPromises);
+
+    next();
+});*/
 
     // Testing POST Document middleware ----------
 tourSchema.post('save', function (doc, next) {
@@ -142,7 +149,9 @@ tourSchema.post('save', function (doc, next) {
 
 // -------------- Query Middleware --------------
 tourSchema.pre(/^find/, function (next) {
-    this.find({ secretTour: { $ne: true } });
+    this.find({
+        secretTour: { $ne: true }
+    });
     // in Schema,
     // secretTour: {
     //         type: Boolean,
@@ -158,7 +167,7 @@ tourSchema.pre(/^find/, function (next) {
 
 tourSchema.pre(/^find/, function (next) {
     this.populate({
-        path: 'guides',
+        path: 'guides', // key field name that created in schema
         select: '-__v -passwordChangedAt'
     });
 
