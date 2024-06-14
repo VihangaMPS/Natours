@@ -4,8 +4,10 @@ const authController = require('../controllers/authController');
 
 const reviewRouter = express.Router();
 
-reviewRouter.route('/').get(reviewController.getAllReviews)
-    .post(authController.protect,authController.restrictTo('user'),reviewController.createReview);
+// Create a Review & Get all created Reviews -----------------
+reviewRouter.route('/')
+    .get(reviewController.getAllReviews)
+    .post(authController.protect, authController.restrictTo('user'),reviewController.createReview);
 
 
 module.exports = reviewRouter;
