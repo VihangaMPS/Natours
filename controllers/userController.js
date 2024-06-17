@@ -16,7 +16,7 @@ const filterObj = (obj, ...allowedFields) => {
     return newObj;
 };
 
-// ==========  Handler Functions  ==============
+            // ==========  Handler Functions  ==============
 exports.getAllUsers = catchAsync(async (req, res, next) => {
     const users = await User.find();
 
@@ -30,7 +30,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
         });
 });
 
-// ---- Only use this route for Update User data other than Password -------
+// ---- Only use this route for Update User 'name' & 'email' fields no password -------
 exports.updateMe = catchAsync(async (req, res, next) => {
     // 1) Create error if user POST password data
     if (req.body.password || req.body.passwordConfirm) {
@@ -54,6 +54,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     })
 });
 
+// ------------- Only deactivating user not deleting permanently in database -------------
 exports.deleteMe = catchAsync( async(req, res, next) => {
     await User.findByIdAndUpdate(req.user.id, {active: false});
 
@@ -63,7 +64,7 @@ exports.deleteMe = catchAsync( async(req, res, next) => {
     })
 });
 
-exports.getUser = (req, res) => {
+/*exports.getUser = (req, res) => {
     res.status(500).json({
         status: 'error',
         message: 'This route is not yet defined'
@@ -73,15 +74,12 @@ exports.getUser = (req, res) => {
 exports.createUser = (req, res) => {
     res.status(500).json({
         status: 'error',
-        message: 'This route is not yet defined'
+        message: 'This route is not yet defined! Please use "/signup" route instead'
     });
-};
+};*/
 
-exports.updateUser = (req, res) => {
-    res.status(500).json({
-        status: 'error',
-        message: 'This route is not yet defined'
-    });
-};
+// ----------- Updating user data other than password field -----------
+exports.updateUser = factory.updateOne(User);
 
+// ------------- Deleting user permanently from database -------------
 exports.deleteUser = factory.deleteOne(User);

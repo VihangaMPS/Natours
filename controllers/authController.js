@@ -41,7 +41,7 @@ const createSendToken = (user, statusCode, res) => {
 }
 
 exports.signup = catchAsync(async (req, res, next) => {
-    console.log(req.body);
+    // console.log(req.body);
     const newUser = await User.create(req.body);
 
     createSendToken(newUser, 201, res);
@@ -173,8 +173,7 @@ exports.resetPassword = catchAsync( async (req, res, next) => {
 exports.updatePassword = catchAsync( async(req, res,next) => {
     // 1) Get user from collection
     const user = await User.findById(req.user.id).select("+password");
-    console.log(user);
-    console.log(req.body);
+
     // 2) Check if POST current password is correct
     if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
         return next(new AppError('Your current password is wrong', 401));
