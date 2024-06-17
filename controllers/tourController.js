@@ -1,7 +1,5 @@
 const Tour = require('../models/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 
 // ==========  Handler Functions  ==============
@@ -12,44 +10,9 @@ exports.aliasTopTours = (req, res, next) => {
     next();
 }
 
-exports.getAllTours = catchAsync(async (req, res, next) =>  {
-    // console.log("getAllTours req.query : " , req.query);
-    // request info -> ex:{ duration: { gte: '5' }, difficulty: 'easy', price: { lt: '1000' } }
+exports.getAllTours = factory.getAll(Tour);
 
-    // ---------- Execute Query ----------
-    const features = new APIFeatures(Tour.find(), req.query).filter().sortData().limitFields().pagination() ;
-    const tours = await features.query;
-
-    res.status(200)
-        .json({
-            status: 'success',
-            results: tours.length,
-            data: {
-                tours: tours
-            }
-        });
-});
-
-exports.getTour = catchAsync(async (req, res, next) => {
-    if (process.env.NODE_ENV === 'development') {
-        console.log("req.params.id :", req.params.id);
-    }
-    const tour = await Tour.findById(req.params.id).populate('reviews');
-    // Populate means -> if we don't use populate we get only the reference id.
-    // if we use populate we get the data for that reference id but only give in response,not updating real database.
-
-    if (!tour) {
-        return next(new AppError('No tour found with that ID', 404));
-    }
-
-    res.status(200)
-        .json({
-            status: 'success',
-            data: {
-                tour: tour
-            }
-        });
-});
+exports.getTour = factory.getOne(Tour, {path: 'reviews'});
 
 exports.createTour = factory.createOne(Tour);
 

@@ -18,7 +18,7 @@ userRouter.route('/updateMe').patch(authController.protect,userController.update
 userRouter.route('/deleteMe').delete(authController.protect,userController.deleteMe); // deleting the current logged-in user
 
     // -------------- REST Routes --------------
-userRouter.route('/').get(userController.getAllUsers)/*.post(userController.createUser)*/;
-userRouter.route('/:id')/*.get(userController.getUser)*/.patch(userController.updateUser).delete(userController.deleteUser);
+userRouter.route('/').get(userController.getAllUsers).post(userController.createUser);
+userRouter.route('/:id').get(userController.getUser).patch(userController.updateUser).delete(userController.deleteUser);
 
 module.exports = userRouter;

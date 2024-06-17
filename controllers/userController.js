@@ -16,19 +16,7 @@ const filterObj = (obj, ...allowedFields) => {
     return newObj;
 };
 
-            // ==========  Handler Functions  ==============
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-    const users = await User.find();
-
-    res.status(200)
-        .json({
-            status: 'success',
-            results: users.length,
-            data: {
-                tours: users
-            }
-        });
-});
+            // ==========  Handler Functions  =============
 
 // ---- Only use this route for Update User 'name' & 'email' fields no password -------
 exports.updateMe = catchAsync(async (req, res, next) => {
@@ -64,19 +52,17 @@ exports.deleteMe = catchAsync( async(req, res, next) => {
     })
 });
 
-/*exports.getUser = (req, res) => {
-    res.status(500).json({
-        status: 'error',
-        message: 'This route is not yet defined'
-    });
-};
+
+exports.getAllUsers = factory.getAll(User);
+
+exports.getUser = factory.getOne(User);
 
 exports.createUser = (req, res) => {
     res.status(500).json({
         status: 'error',
-        message: 'This route is not yet defined! Please use "/signup" route instead'
+        message: 'This route is not defined! Please use "/signup" route instead'
     });
-};*/
+};
 
 // ----------- Updating user data other than password field -----------
 exports.updateUser = factory.updateOne(User);
