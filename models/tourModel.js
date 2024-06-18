@@ -113,6 +113,10 @@ const tourSchema = new mongoose.Schema({
     toObject: { virtuals: true}
 });
 
+// TO improve Read performance with Indexes
+tourSchema.index( {price: 1, ratingsAverage: -1} );
+tourSchema.index( {slug: 1} ); // 1 - ASC | -1 - DESC
+
 // Virtual data won't save in Database access only in response
 tourSchema.virtual('durationWeeks').get( function () {
     return this.duration / 7; // creating a virtual key field "durationWeeks" & assigning calculated days for a week
