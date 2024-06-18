@@ -14,6 +14,7 @@ userRouter.route('/resetPassword/:token').patch(authController.resetPassword);
 
 userRouter.route('/updateMyPassword').patch(authController.protect,authController.updatePassword);
 
+userRouter.route('/me').get(authController.protect,userController.getMe,userController.getUser); // To get current logged-in user data
 userRouter.route('/updateMe').patch(authController.protect,userController.updateMe); // updating the current logged-in user
 userRouter.route('/deleteMe').delete(authController.protect,userController.deleteMe); // deleting the current logged-in user
 

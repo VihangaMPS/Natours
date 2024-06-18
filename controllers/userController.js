@@ -17,6 +17,12 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
             // ==========  Handler Functions  =============
+// -------- Get my data ----------
+exports.getMe =  (req, res, next) => {
+    req.params.id = req.user.id;
+
+    next();
+}
 
 // ---- Only use this route for Update User 'name' & 'email' fields no password -------
 exports.updateMe = catchAsync(async (req, res, next) => {
