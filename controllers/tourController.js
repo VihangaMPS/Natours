@@ -20,7 +20,9 @@ exports.updateTour = factory.updateOne(Tour);
 
 exports.deleteTour = factory.deleteOne(Tour);
 
-exports.getTourStats = catchAsync(async (req, res, next) => { // we use aggregate to find min,max,sum,distance calculation values
+// Custom Aggregate Functions --------------
+exports.getTourStats = catchAsync(async (req, res, next) => {
+    // we use aggregate to find min,max,sum,distance calculation values
     const stats = await Tour.aggregate([
         {
             $match: { ratingsAverage: { $gte: 4.5} } // ratingsAverage >= 4.5

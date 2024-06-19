@@ -32,7 +32,7 @@ const tourSchema = new mongoose.Schema({
     },
     ratingsAverage: {
         type: Number,
-        default: 4.5,
+        default: 3.5,
         min: [1, 'Rating must be above 1.0'],
         max: [5, 'Rating must be below 5.0']
     },
@@ -113,7 +113,7 @@ const tourSchema = new mongoose.Schema({
     toObject: { virtuals: true}
 });
 
-// TO improve Read performance with Indexes
+// To improve Read performance with Indexes
 tourSchema.index( {price: 1, ratingsAverage: -1} );
 tourSchema.index( {slug: 1} ); // 1 - ASC | -1 - DESC
 
