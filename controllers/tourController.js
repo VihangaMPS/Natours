@@ -27,21 +27,21 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
     // we use aggregate to find min,max,sum,distance calculation values
     const stats = await Tour.aggregate([
         {
-            $match: { ratingsAverage: { $gte: 4.5} } // ratingsAverage >= 4.5
+            $match: {ratingsAverage: {$gte: 4.5}} // ratingsAverage >= 4.5
         },
         {
             $group: {
-                _id: { $toUpper: "$difficulty"},
-                numTours: { $sum: 1 },
-                numRatings: { $sum: '$ratingsQuantity'},
-                avgRating: { $avg: '$ratingsAverage'},
-                avgPrice: { $avg: '$price'},
-                minPrice: { $min: '$price'},
-                maxPrice: { $max: '$price'},
+                _id: {$toUpper: "$difficulty"},
+                numTours: {$sum: 1},
+                numRatings: {$sum: '$ratingsQuantity'},
+                avgRating: {$avg: '$ratingsAverage'},
+                avgPrice: {$avg: '$price'},
+                minPrice: {$min: '$price'},
+                maxPrice: {$max: '$price'},
             }
         },
         {
-            $sort: { avgPrice: 1 } // 1 -> ASC & -1 -> DESC
+            $sort: {avgPrice: 1} // 1 -> ASC & -1 -> DESC
         },
         // {
         //     $match: { _id: { $ne: 'EASY' }}
@@ -74,19 +74,19 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
         },
         {
             $group: {
-                _id: { $month: '$startDates' },
-                numToursStarts: { $sum: 1 },
-                tours: { $push: '$name' }
+                _id: {$month: '$startDates'},
+                numToursStarts: {$sum: 1},
+                tours: {$push: '$name'}
             }
         },
         {
-            $addFields: { month: '$_id' }
+            $addFields: {month: '$_id'}
         },
         {
-            $project: { _id: 0 }
+            $project: {_id: 0}
         },
         {
-            $sort: { numTourStarts: -1 }
+            $sort: {numTourStarts: -1}
         },
         {
             $limit: 15
@@ -101,20 +101,22 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     });
 });
 
-exports.getToursWithin = catchAsync( async (req, res, next) => {
+exports.getToursWithin = catchAsync(async (req, res, next) => {
     const {distance, latlng, unit} = req.params;
     const [lat, lng] = latlng.split(",");
     const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
 
     if (!lat || !lng) {
-        next( new AppError('Please provide latitude and longitude in the format lat,lng', 400));
+        next(new AppError('Please provide latitude and longitude in the format lat,lng', 400));
     }
 
     // console.log(distance, lat, lng, unit);
     const tours = await Tour.find({
-        startLocation: {$geoWithin: {
-            $centerSphere: [[lng, lat], radius]
-            }}
+        startLocation: {
+            $geoWithin: {
+                $centerSphere: [[lng, lat], radius]
+            }
+        }
     });
 
     res.status(200).json({
@@ -125,3 +127,41 @@ exports.getToursWithin = catchAsync( async (req, res, next) => {
         }
     })
 });
+
+exports.getDistances = catchAsync(async (req, res, next) => {
+    const {latlng, unit} = req.params;
+    const [lat, lng] = latlng.split(",");
+
+    const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+
+    if (!lat || !lng) {
+        next(new AppError('Please provide latitude and longitude in the format lat,lng', 400));
+    }
+
+    const distances = await Tour.aggregate([
+        {
+            $geoNear: {
+                near: {
+                    type: 'Point',
+                    coordinates: [lng * 1, lat * 1]
+                },
+                distanceField: 'distance',
+                distanceMultiplier: multiplier
+            }
+        },
+        {
+            $project: {
+                distance: 1,
+                name: 1
+            }
+        }
+    ]);
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            data: distances
+        }
+    })
+
+})

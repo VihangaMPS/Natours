@@ -187,11 +187,11 @@ tourSchema.post(/^find/, function (docs, next) {
 });
 
 // -------------- Aggregation Middleware --------------
-tourSchema.pre('aggregate', function (next) {
+/*tourSchema.pre('aggregate', function (next) {
     this.pipeline().unshift( { $match: { secretTour: { $ne: true } }});
     console.log("Aggregation pipeline :",this.pipeline());
     next();
-});
+});*/
 
 
 

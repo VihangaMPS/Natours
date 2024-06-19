@@ -14,6 +14,7 @@ tourRouter.route('/top-5-cheap').get(tourController.aliasTopTours,tourController
 tourRouter.route('/monthly-plan/:year').get(authController.protect,authController.restrictTo('admin', 'lead-guide', 'guide'),tourController.getMonthlyPlan);
 
 tourRouter.route('/tours-within/:distance/center/:latlng/unit/:unit').get(tourController.getToursWithin);
+tourRouter.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
 
     // ------------ REST Routes ------------
 tourRouter.route('/').get(tourController.getAllTours)
