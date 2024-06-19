@@ -117,6 +117,7 @@ const tourSchema = new mongoose.Schema({
 // To improve Read performance with Indexes
 tourSchema.index( {price: 1, ratingsAverage: -1} );
 tourSchema.index( {slug: 1} ); // 1 - ASC | -1 - DESC
+tourSchema.index({startLocation: '2dsphere'})
 
 // Virtual data won't save in Database access only in response
 tourSchema.virtual('durationWeeks').get( function () {

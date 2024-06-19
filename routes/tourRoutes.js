@@ -13,6 +13,8 @@ tourRouter.route('/tour-stats').get(tourController.getTourStats);
 tourRouter.route('/top-5-cheap').get(tourController.aliasTopTours,tourController.getAllTours);
 tourRouter.route('/monthly-plan/:year').get(authController.protect,authController.restrictTo('admin', 'lead-guide', 'guide'),tourController.getMonthlyPlan);
 
+tourRouter.route('/tours-within/:distance/center/:latlng/unit/:unit').get(tourController.getToursWithin);
+
     // ------------ REST Routes ------------
 tourRouter.route('/').get(tourController.getAllTours)
     .post(authController.protect,authController.restrictTo('admin', 'lead-guide'),tourController.createTour);
