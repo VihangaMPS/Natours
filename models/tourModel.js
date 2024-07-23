@@ -124,6 +124,7 @@ tourSchema.virtual('durationWeeks').get( function () {
     return this.duration / 7; // creating a virtual key field "durationWeeks" & assigning calculated days for a week
 });
 
+// Virtual Populate
 tourSchema.virtual('reviews', {
     ref: 'Review',
     foreignField: 'tour', // assigning field name for referenced id in foreign schema
@@ -145,12 +146,6 @@ tourSchema.pre('save', function (next) {
 
     next();
 });*/
-
-    // Testing POST Document middleware ----------
-tourSchema.post('save', function (doc, next) {
-    // console.log("doc :", doc);
-    next();
-});
 
 
 // -------------- Query Middleware --------------

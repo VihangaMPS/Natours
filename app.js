@@ -5,15 +5,22 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const path = require('path');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
-const  userRouter = require('./routes/userRoutes');
-const  reviewRouter = require('./routes/reviewRoutes');
-const http = require("node:http");
+const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express(); // Main Router
+
+// Setting up Template engine PUG
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+// ------------ Setting Public Directory Path Accessing Static files --------------
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ================== Middleware =====================
     // ----------- Middleware to send the req json body when we create(POST) -----------
@@ -46,8 +53,6 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-    // ------------ Setting Public Directory Path Accessing Static files --------------
-app.use(express.static(`${__dirname}/public`));
 
     // ------------ Custom Test Middleware -----------
 app.use((req, res, next) => {
@@ -57,6 +62,13 @@ app.use((req, res, next) => {
 });
 
 // ========== Middleware Routes  ==============
+// app.get('/', (req, res) => {
+//     res.status(200).render('base', {
+//         tour: 'The Forest Hike',
+//         user: 'Vihanga'
+//     });
+// })
+
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);

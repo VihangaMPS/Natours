@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const dotenv = require('dotenv'); // use to get environment package
 
 // --------- Handling UnCaughtExceptions/Synchronous ----------
 process.on('uncaughtException', err => {
@@ -7,7 +8,6 @@ process.on('uncaughtException', err => {
     process.exit(1)
 });
 
-const dotenv = require('dotenv'); // use to get environment package
 dotenv.config({path: './config.env'}); // applying custom environment variables to environment package
 const app = require('./app');
 
@@ -36,3 +36,6 @@ process.on('unhandledRejection', err => {
 
 // so we use Embedded, High Read/Low Write data
             // Referenced, Low Read/High Write data
+
+// Postman API ----------------
+// https://documenter.getpostman.com/view/30942225/2sA3XTfLdL

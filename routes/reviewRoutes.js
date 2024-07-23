@@ -2,6 +2,7 @@ const express = require('express');
 const reviewController = require('../controllers/reviewController');
 const authController = require('../controllers/authController');
 
+// Merge Params for other routes to access this routes
 const reviewRouter = express.Router({ mergeParams: true });
 
 reviewRouter.use(authController.protect);
